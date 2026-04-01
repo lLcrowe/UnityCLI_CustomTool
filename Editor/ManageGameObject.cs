@@ -125,7 +125,7 @@ namespace UnityCLI.CustomTools
                 if (!string.IsNullOrEmpty(componentFilter))
                 {
                     var type = GameObjectResolver.ResolveComponentType(componentFilter);
-                    if (type == null || go.GetComponent(type) == null)
+                    if (type == null || !go.TryGetComponent(type, out _))
                         continue;
                 }
 
@@ -358,8 +358,7 @@ namespace UnityCLI.CustomTools
                 return new ErrorResponse($"Component type '{typeName}' not found.");
 
             var go = result.Value;
-            var component = go.GetComponent(type);
-            if (component == null)
+            if (!go.TryGetComponent(type, out var component))
                 return new ErrorResponse($"'{go.name}' has no {typeName} component.");
 
             Undo.DestroyObjectImmediate(component);

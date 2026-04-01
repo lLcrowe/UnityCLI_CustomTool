@@ -161,8 +161,7 @@ namespace UnityCLI.CustomTools
             if (type == null)
                 return new ResolvedComponent { error = new ErrorResponse($"Component type '{typeName}' not found.") };
 
-            var component = goResult.Value.GetComponent(type);
-            if (component == null)
+            if (!goResult.Value.TryGetComponent(type, out var component))
                 return new ResolvedComponent { error = new ErrorResponse($"'{goResult.Value.name}' has no {typeName} component.") };
 
             return new ResolvedComponent
