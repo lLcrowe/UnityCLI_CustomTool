@@ -1,0 +1,13 @@
+{
+  "name": "com.llcrowe.unity-cli-custom-tools",
+  "version": "0.1.0",
+  "displayName": "Unity CLI Custom Tools",
+  "description": "GameObject, Scene, Component, Asset, Batch custom tools for unity-cli. Requires unity-cli-connector package.",
+  "unity": "2022.3",
+  "dependencies": {
+    "com.youngwoocho02.unity-cli-connector": "0.3.5"
+  },
+  "author": {
+    "name": "lLcrowe"
+  }
+}
