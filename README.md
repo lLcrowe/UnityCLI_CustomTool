@@ -129,6 +129,55 @@ unity-cli CLI → HTTP → unity-cli-connector (ToolDiscovery)
 - 에셋 변경(create_folder, delete 등)은 도메인 리로드를 유발할 수 있습니다
 - `find` 결과는 페이지네이션 지원 (`--page_size`, `--cursor`)
 
+## For AI Agents
+
+AI 코딩 에이전트(Claude Code, Codex 등)가 이 도구를 사용할 때 참고하는 섹션입니다.
+
+### 기본 원칙
+- `unity-cli status`로 연결 확인 후 작업 시작
+- 커맨드 결과는 JSON: `{"success": true/false, "message": "...", "data": {...}}`
+- `success` 필드로 성공/실패 판별, `data`에서 구조화된 결과 추출
+- 에셋 변경 커맨드는 응답에 `"Unity reloaded, now ready"` 포함 가능 — 정상
+
+### 자주 쓰는 패턴
+
+**오브젝트 생성 → 컴포넌트 추가 → 속성 설정:**
+```bash
+unity-cli gameobject --action create_primitive --primitive_type Cube --name "Player"
+unity-cli gameobject --action add_component --name "Player" --component_type Rigidbody
+unity-cli component --action set_property --name "Player" --component_type Rigidbody --property m_Mass --value 5
+```
+
+**씬 상태 확인 → 저장:**
+```bash
+unity-cli scene --action get_active
+unity-cli gameobject --action get_hierarchy --max_depth 2
+unity-cli scene --action save
+```
+
+**여러 작업 한 번에 (batch):**
+```bash
+unity-cli batch --params '{"commands":[
+  {"command":"gameobject","params":{"action":"create","name":"A"}},
+  {"command":"gameobject","params":{"action":"create","name":"B"}}
+]}'
+```
+
+**빌트인으로 안 되는 작업 (exec 폴백):**
+```bash
+echo 'return string.Join("\n", FindObjectsByType<Rigidbody>(FindObjectsSortMode.None).Select(r => r.name));' | unity-cli exec
+```
+
+### 주의사항
+- 비활성 GO는 `--name`으로 찾을 수 있지만 `--instance_id`가 더 안전
+- batch의 commands는 `--params '{"commands":[...]}'` 형식 사용 (`--commands` 아님)
+- exec 복잡한 코드는 `echo '...' | unity-cli exec` 파이프로 전달 (셸 이스케이프 방지)
+- 컴파일 후 `unity-cli console --type error`로 에러 확인
+
+### 스킬 파일
+이 repo의 `.claude/skills/SKILL.md`에 전체 커맨드 레퍼런스가 있습니다.
+Claude Code에서 트리거 키워드: `unity-cli`, `게임오브젝트 CLI`, `씬 CLI`, `에셋 CLI`, `배치실행`
+
 ## License
 
 MIT
